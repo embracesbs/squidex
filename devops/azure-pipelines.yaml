@@ -34,6 +34,9 @@ pool:
 
 steps:
 
+- checkout: MyGitHubSquidex
+  path: squidex
+
 - task: Docker@2
   name: DockerBuild
   displayName: 'Docker Build'
@@ -41,7 +44,7 @@ steps:
     command: build
     containerRegistry: $(Docker.ServiceConnectionName)
     repository: $(Docker.Repository.Name)
-    dockerfile: '$(Agent.BuildDirectory)/Dockerfile'
+    dockerfile: '$(Agent.BuildDirectory)/squidex/Dockerfile'
     arguments: --build-arg GIT_REPO=embracesbs/squidex --build-arg GIT_BRANCH=feature/use-kubernetes-hosting
     addPipelineData: false
     tags: |
