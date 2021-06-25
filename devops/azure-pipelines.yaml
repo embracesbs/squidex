@@ -34,6 +34,8 @@ pool:
 
 steps:
 
+- checkout: none
+
 - checkout: MyGitHubSquidex
   path: squidex
 
@@ -49,6 +51,7 @@ steps:
     addPipelineData: false
     tags: |
       $(Version)
+      $(Version.Tag)
 
 - task: Docker@2
   name: DockerPush
@@ -62,3 +65,4 @@ steps:
     addPipelineData: false
     tags: |
       $(Version)
+      $(Version.Tag)
