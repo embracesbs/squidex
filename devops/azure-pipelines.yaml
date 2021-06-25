@@ -34,6 +34,9 @@ pool:
 
 steps:
 
+- checkout: self
+  enabled: false
+  
 - checkout: MyGitHubSquidex
   path: squidex
 
