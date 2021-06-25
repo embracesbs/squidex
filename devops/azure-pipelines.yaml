@@ -1,0 +1,61 @@
+trigger:
+- feature/use-kubernetes-hosting
+
+resources:
+  repositories:
+  - repository: MyGitHubSquidex
+    type: github
+    endpoint: GitHubEmbraceSBSSquidex
+    name: embracesbs/squidex
+    ref: refs/tags/5.7.1
+
+variables:
+- name: Version.Major
+  value: 5
+- name: Version.Minor
+  value: 7
+- name: Version.Patch
+  value: 1-usekuberneteshosting
+- name: Version.Tag
+  value: $(Version.Major).$(Version.Minor).$(Version.Patch)
+- name: Version.Revision
+  value: $[counter(variables['Version.Tag'], 0)]
+- name: Version
+  value: $(Version.Tag)-$(Version.Revision)
+- name: Docker.ServiceConnectionName
+  value: 'dockerembrace'
+- name: Docker.Registry
+  value: 'dockerembrace.azurecr.io' 
+- name: Docker.Repository.Name
+  value: squidex
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+- task: Docker@2
+  name: DockerBuild
+  displayName: 'Docker Build'
+  inputs:
+    command: build
+    containerRegistry: $(Docker.ServiceConnectionName)
+    repository: $(Docker.Repository.Name)
+    dockerfile: '$(Agent.BuildDirectory)/Dockerfile'
+    arguments: --build-arg GIT_REPO=embracesbs/squidex --build-arg GIT_BRANCH=feature/use-kubernetes-hosting
+    addPipelineData: false
+    tags: |
+      $(Version)
+
+- task: Docker@2
+  name: DockerPush
+  condition: and(succeeded(), not(eq(variables['Build.Reason'], 'PullRequest')))
+  displayName: 'Docker Push'
+  inputs:
+    command: push
+    containerRegistry: $(Docker.ServiceConnectionName)
+    repository: $(Docker.Repository.Name)
+    buildContext: '**'
+    addPipelineData: false
+    tags: |
+      $(Version)
