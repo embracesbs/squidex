@@ -71,29 +71,41 @@ namespace Squidex.Config.Orleans
 
             var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
             var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
+            var orleansKubernetesHosting = config.GetOptionalValue("orleans:useKubernetesHosting", false);
 
             config.ConfigureByOption("orleans:clustering", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {
-                    IPAddress address;
-
-                    var configuredAddress = config.GetOptionalValue("orleans:ipAddress", string.Empty);
-
-                    if (!string.IsNullOrWhiteSpace(configuredAddress))
+                    if (orleansKubernetesHosting) 
                     {
-                        address = IPAddress.Parse(configuredAddress);
+                        builder.UseKubernetesHosting();
+
+                        builder.ConfigureEndpoints(
+                            siloPort: orleansPortSilo, 
+                            gatewayPort: orleansPortGateway);
                     }
                     else
                     {
-                        address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
-                    }
+                        IPAddress address;
 
-                    builder.ConfigureEndpoints(
-                        address,
-                        orleansPortSilo,
-                        orleansPortGateway,
-                        true);
+                        var configuredAddress = config.GetOptionalValue("orleans:ipAddress", string.Empty);
+
+                        if (!string.IsNullOrWhiteSpace(configuredAddress))
+                        {
+                            address = IPAddress.Parse(configuredAddress);
+                        }
+                        else
+                        {
+                            address = Helper.ResolveIPAddressAsync(Dns.GetHostName(), AddressFamily.InterNetwork).Result;
+                        }
+
+                        builder.ConfigureEndpoints(
+                            address,
+                            orleansPortSilo,
+                            orleansPortGateway,
+                            true);
+                    }
 
                     builder.UseMongoDBClustering(options =>
                     {
