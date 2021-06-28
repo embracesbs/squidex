@@ -19,12 +19,13 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Web;
+using Squidex.Log;
 
 namespace Squidex.Config.Orleans
 {
     public static class OrleansServices
     {
-        public static void ConfigureForSquidex(this ISiloBuilder builder, IConfiguration config)
+        public static void ConfigureForSquidex(this ISiloBuilder builder, IConfiguration config, ISemanticLog log)
         {
             builder.AddOrleansPubSub();
 
@@ -73,6 +74,7 @@ namespace Squidex.Config.Orleans
             var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
             var orleansKubernetesHosting = config.GetOptionalValue("orleans:useKubernetesHosting", false);
 
+
             config.ConfigureByOption("orleans:clustering", new Alternatives
             {
                 ["MongoDB"] = () =>
@@ -80,10 +82,16 @@ namespace Squidex.Config.Orleans
                     if (orleansKubernetesHosting) 
                     {
                         builder.UseKubernetesHosting();
-
+                        
                         builder.ConfigureEndpoints(
                             siloPort: orleansPortSilo, 
                             gatewayPort: orleansPortGateway);
+                            
+                        log.LogWarning(w => w
+                            .WriteProperty("orleansKubernetesHosting", orleansKubernetesHosting)
+                            .WriteProperty("siloPort", orleansPortSilo)
+                            .WriteProperty("gatewayPort", orleansPortGateway)
+                        );
                     }
                     else
                     {
