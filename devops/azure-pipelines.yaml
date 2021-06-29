@@ -1,21 +1,21 @@
 trigger:
 - feature/use-kubernetes-hosting
 
-#resources:
-#  repositories:
-#  - repository: MyGitHubSquidex
-#    type: github
-#    endpoint: GitHubEmbraceSBSSquidex
-#    name: embracesbs/squidex
-#    ref: refs/tags/5.7.1
+resources:
+  repositories:
+  - repository: MyGitHubSquidex
+    type: github
+    endpoint: GitHubEmbraceSBSSquidex
+    name: embracesbs/squidex
+    ref: refs/tags/5.8.0
 
 variables:
 - name: Version.Major
   value: 5
 - name: Version.Minor
-  value: 7
+  value: 8
 - name: Version.Patch
-  value: 1-usekuberneteshosting
+  value: 0-usekuberneteshosting
 - name: Version.Tag
   value: $(Version.Major).$(Version.Minor).$(Version.Patch)
 - name: Version.Revision
@@ -35,12 +35,12 @@ pool:
 steps:
 
 # shallow fetch for speed
-- checkout: self
-  fetchDepth: 1
-  path: squidex
-
-#- checkout: MyGitHubSquidex
+#- checkout: self
+#  fetchDepth: 1
 #  path: squidex
+
+- checkout: MyGitHubSquidex
+  path: squidex
 
 - task: Docker@2
   name: DockerBuild
