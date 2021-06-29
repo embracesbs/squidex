@@ -1,13 +1,13 @@
 trigger:
 - master
 
-resources:
-  repositories:
-  - repository: MyGitHubSquidex
-    type: github
-    endpoint: GitHubEmbraceSBSSquidex
-    name: embracesbs/squidex
-    ref: refs/tags/5.8.0
+#resources:
+#  repositories:
+#  - repository: MyGitHubSquidex
+#    type: github
+#    endpoint: GitHubEmbraceSBSSquidex
+#    name: embracesbs/squidex
+#    ref: refs/tags/5.8.0
 
 variables:
 - name: Version.Major
@@ -35,12 +35,12 @@ pool:
 steps:
 
 # shallow fetch for speed
-#- checkout: self
-#  fetchDepth: 1
-#  path: squidex
-
-- checkout: MyGitHubSquidex
+- checkout: self
+  fetchDepth: 1
   path: squidex
+
+#- checkout: MyGitHubSquidex
+#  path: squidex
 
 - task: Docker@2
   name: DockerBuild
