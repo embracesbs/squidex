@@ -15,7 +15,7 @@ variables:
 - name: Version.Minor
   value: 8
 - name: Version.Patch
-  value: 0-usekuberneteshosting
+  value: 0-usekuberneteshostingopensslfix
 - name: Version.Tag
   value: $(Version.Major).$(Version.Minor).$(Version.Patch)
 - name: Version.Revision
