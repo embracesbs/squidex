@@ -64,7 +64,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:5.0.0-buster-slim
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine
 
 # Curl for debugging and libc-dev for Protobuf
 RUN apt-get update \
